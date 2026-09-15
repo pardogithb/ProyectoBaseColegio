@@ -1,26 +1,17 @@
 <!DOCTYPE html>
-<!-- Este archivo contiene la estructura visible de la aplicación escolar.
-    Se conecta con app.js mediante los identificadores de formularios, tablas y botones.
-    También carga estilos.css para definir la apariencia de la página. -->
 <html lang="es">
 <head>
-    <!-- Permite mostrar correctamente caracteres propios del español. -->
     <meta charset="UTF-8">
-    <!-- Texto que aparece en la pestaña del navegador. -->
     <title>Sistema de Notas - Colegio</title>
-    <!-- Carga los estilos visuales de la aplicación. -->
     <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 
-    <!-- Encabezado principal de la pantalla. -->
     <h1>Sistema de Seguimiento de Notas</h1>
 
-    <!-- Sección para crear, editar y listar estudiantes. -->
     <section>
         <h2>Estudiantes</h2>
         <form id="formEstudiante">
-            <!-- Guarda temporalmente el ID cuando el formulario está en modo edición. -->
             <input type="hidden" id="estudianteId">
             <input type="text" id="nombreEstudiante" placeholder="Nombre" required>
             <input type="text" id="gradoEstudiante" placeholder="Grado (ej: 10-A)" required>
@@ -28,16 +19,13 @@
         </form>
 
         <table id="tablaEstudiantes">
-            <!-- Encabezados de las columnas que se llenan desde app.js. -->
             <thead>
                 <tr><th>ID</th><th>Nombre</th><th>Grado</th><th>Acciones</th></tr>
             </thead>
-            <!-- app.js inserta aquí una fila por cada estudiante. -->
             <tbody></tbody>
         </table>
     </section>
-        <!-- Sección para crear y listar materias. -->
-        <section>
+    <section>
         <h2>Materias</h2>
         <form id="formMateria">
             <input type="text" id="nombreMateria" placeholder="Nombre de la materia" required>
@@ -45,22 +33,17 @@
         </form>
 
         <table id="tablaMaterias">
-            <!-- Encabezados de las columnas de materias. -->
             <thead>
                 <tr><th>ID</th><th>Nombre</th></tr>
             </thead>
-            <!-- app.js inserta aquí las materias recibidas desde la API. -->
             <tbody></tbody>
         </table>
     </section>
 
-    <!-- Sección para registrar una nota nueva. -->
     <section>
         <h2>Registrar Nota</h2>
         <form id="formNota">
-            <!-- Identificador del estudiante relacionado con la nota. -->
             <input type="number" id="idEstudianteNota" placeholder="ID Estudiante" required>
-            <!-- app.js llena este selector con las materias disponibles. -->
             <select id="idMateriaNota" required>
                 <option value="">-- Selecciona una materia --</option>
             </select>
@@ -70,7 +53,6 @@
         </form>
     </section>
 
-    <!-- Sección para consultar el promedio de un estudiante. -->
     <section>
         <h2>Consultar Promedio</h2>
         <input type="number" id="idEstudianteConsulta" placeholder="ID Estudiante">
@@ -78,7 +60,6 @@
         <p id="resultadoPromedio"></p>
     </section>
 
-    <!-- Carga la lógica de interacción y comunicación con la API. -->
     <script src="app.js"></script>
 </body>
 </html>
