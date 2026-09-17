@@ -1,5 +1,5 @@
-const RepositorioBase = require('./RepositorioBase');
-const { sql, pool } = require('../db');
+import RepositorioBase from './RepositorioBase.js';
+import { sql, pool } from '../db.js';
 
 class MateriaRepo extends RepositorioBase {
     constructor() {
@@ -22,4 +22,4 @@ class MateriaRepo extends RepositorioBase {
     }
 }
 
-module.exports = MateriaRepo;
+export default MateriaRepo;

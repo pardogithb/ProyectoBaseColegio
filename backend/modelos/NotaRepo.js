@@ -1,5 +1,5 @@
-const RepositorioBase = require('./RepositorioBase');
-const { sql, pool } = require('../db');
+import RepositorioBase from './RepositorioBase.js';
+import { sql, pool } from '../db.js';
 
 class NotaRepo extends RepositorioBase {
     constructor() {
@@ -48,4 +48,4 @@ class NotaRepo extends RepositorioBase {
     }
 }
 
-module.exports = NotaRepo;
+export default NotaRepo;

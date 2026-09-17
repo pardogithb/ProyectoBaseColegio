@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-const EstudianteRepo = require('../modelos/EstudianteRepo');
-const MateriaRepo = require('../modelos/MateriaRepo');
-const NotaRepo = require('../modelos/NotaRepo');
+import EstudianteRepo from '../modelos/EstudianteRepo.js';
+import MateriaRepo from '../modelos/MateriaRepo.js';
+import NotaRepo from '../modelos/NotaRepo.js';
 
 const estudianteRepo = new EstudianteRepo();
 const materiaRepo = new MateriaRepo();
@@ -54,4 +54,4 @@ router.get('/notas/promedio/:idEstudiante', async (req, res) => {
     res.json({ promedio });
 });
 
-module.exports = router;
+export default router;

@@ -1,4 +1,4 @@
-const { sql, pool } = require('../db');
+import { sql, pool } from '../db.js';
 
 class RepositorioBase {
     constructor(nombreTabla) {
@@ -28,4 +28,4 @@ class RepositorioBase {
     }
 }
 
-module.exports = RepositorioBase;
+export default RepositorioBase;

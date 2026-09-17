@@ -1,7 +1,7 @@
 // Importa el repositorio que consulta los estudiantes.
-const EstudianteRepo = require('../modelos/EstudianteRepo');
+import EstudianteRepo from '../modelos/EstudianteRepo.js';
 // Importa el repositorio que calcula promedios.
-const NotaRepo = require('../modelos/NotaRepo');
+import NotaRepo from '../modelos/NotaRepo.js';
 
 // Ejecuta consultas básicas para comprobar el acceso a datos.
 async function probar() {

@@ -1,4 +1,4 @@
-const sql = require('mssql');
+import sql from 'mssql';
 
 const config = {
     user: 'usuario_java',
@@ -24,4 +24,4 @@ async function conectarBaseDatos() {
 
 const pool = conectarBaseDatos();
 
-module.exports = { sql, pool };
+export { sql, pool };
