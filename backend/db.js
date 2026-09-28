@@ -3,11 +3,10 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Carga las variables desde backend/.env sin importar desde qué carpeta se ejecute node.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '.env'), quiet: true });
 
-// Verifica que las variables obligatorias existan antes de intentar conectar.
+
 const obligatorias = ['DB_USER', 'DB_PASSWORD', 'DB_NAME'];
 const faltantes = obligatorias.filter((nombre) => !process.env[nombre]);
 if (faltantes.length > 0) {

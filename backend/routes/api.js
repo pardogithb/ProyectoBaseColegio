@@ -64,12 +64,10 @@ router.get('/notas/promedio/:idEstudiante', async (req, res) => {
     res.json({ promedio });
 });
 
-router.get('/notas/promedio/:idEstudiante/materia/:idMateria', async (req, res) => {
-    const promedio = await notaRepo.calcularPromedioPorMateria(
-        req.params.idEstudiante,
-        req.params.idMateria
-    );
-    res.json({ promedio });
+router.get('/notas/promedio-materias', async (req, res) => {
+    const { grado } = req.query;
+    const datos = await notaRepo.calcularPromedioPorMateriaGeneral(grado);
+    res.json(datos);
 });
 
 export default router;

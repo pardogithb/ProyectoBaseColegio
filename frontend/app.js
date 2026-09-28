@@ -20,7 +20,22 @@ async function cargarEstudiantes() {
         `;
         tbody.appendChild(fila);
     });
+     llenarFiltroGrados(estudiantes);
 }
+
+function llenarFiltroGrados(estudiantes) {
+    const select = document.getElementById('filtroGradoPromedio');
+    const gradosUnicos = [...new Set(estudiantes.map(est => est.grado))];
+
+    select.innerHTML = '<option value="">-- Todos los cursos --</option>';
+    gradosUnicos.forEach(grado => {
+        const opcion = document.createElement('option');
+        opcion.value = grado;
+        opcion.textContent = grado;
+        select.appendChild(opcion);
+    });
+}
+
 
 document.getElementById('formEstudiante').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -164,6 +179,46 @@ async function eliminarMateria(id) {
         cargarMaterias();
     }
 }
+document.getElementById('btnVerPromedioMaterias').addEventListener('click', async () => {
+    const grado = document.getElementById('filtroGradoPromedio').value;
+    const ruta = grado
+        ? `${API_URL}/notas/promedio-materias?grado=${grado}`
+        : `${API_URL}/notas/promedio-materias`;
+
+    const respuesta = await fetch(ruta);
+    const materias = await respuesta.json();
+
+    const tbody = document.querySelector('#tablaPromedioMaterias tbody');
+    tbody.innerHTML = '';
+
+    materias.forEach(mat => {
+        let estado;
+        if (mat.promedio >= 4.0) {
+            estado = 'Buen desempeño';
+        } else if (mat.promedio >= 3.0) {
+            estado = 'Regular';
+        } else {
+            estado = 'Requiere refuerzo';
+        }
+
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${mat.nombre}</td>
+            <td>${Number(mat.promedio).toFixed(1)}</td>
+            <td>${estado}</td>
+        `;
+        tbody.appendChild(fila);
+    });
+});
+document.querySelectorAll('.tab-btn').forEach(boton => {
+    boton.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('activo'));
+        document.querySelectorAll('.tab-contenido').forEach(c => c.classList.remove('activo'));
+
+        boton.classList.add('activo');
+        document.getElementById(boton.dataset.tab).classList.add('activo');
+    });
+});
 
 cargarEstudiantes();
 cargarMaterias();
