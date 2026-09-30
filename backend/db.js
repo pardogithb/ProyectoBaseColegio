@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '.env'), quiet: true });
 
-
 const obligatorias = ['DB_USER', 'DB_PASSWORD', 'DB_NAME'];
 const faltantes = obligatorias.filter((nombre) => !process.env[nombre]);
 if (faltantes.length > 0) {
