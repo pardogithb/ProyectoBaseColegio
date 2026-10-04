@@ -26,25 +26,34 @@ class NotaRepo extends RepositorioBase {
             .query('UPDATE nota SET valor = @valor, periodo = @periodo WHERE id_nota = @id');
     }
 
-    async calcularPromedio(idEstudiante) {
+    async calcularPromedioPorMateriaGeneral(grado) {
         const conexion = await pool;
-        const resultado = await conexion.request()
-            .input('id_estudiante', sql.Int, idEstudiante)
-            .query(`SELECT AVG(valor) AS promedio 
-                    FROM nota 
-                    WHERE id_estudiante = @id_estudiante`);
-        return resultado.recordset[0].promedio;
-    }
+        const peticion = conexion.request();
+        let consulta;
 
-    async calcularPromedioPorMateria(idEstudiante, idMateria) {
-        const conexion = await pool;
-        const resultado = await conexion.request()
-            .input('id_estudiante', sql.Int, idEstudiante)
-            .input('id_materia', sql.Int, idMateria)
-            .query(`SELECT AVG(valor) AS promedio 
-                    FROM nota 
-                    WHERE id_estudiante = @id_estudiante AND id_materia = @id_materia`);
-        return resultado.recordset[0].promedio;
+        if (grado) {
+            peticion.input('grado', sql.VarChar, grado);
+            consulta = `
+                SELECT m.id_materia, m.nombre, AVG(n.valor) AS promedio, COUNT(n.id_nota) AS cantidad
+                FROM nota n
+                JOIN materia m ON n.id_materia = m.id_materia
+                JOIN estudiante e ON n.id_estudiante = e.id_estudiante
+                WHERE e.grado = @grado
+                GROUP BY m.id_materia, m.nombre
+                ORDER BY promedio DESC
+            `;
+        } else {
+            consulta = `
+                SELECT m.id_materia, m.nombre, AVG(n.valor) AS promedio, COUNT(n.id_nota) AS cantidad
+                FROM materia m
+                LEFT JOIN nota n ON n.id_materia = m.id_materia
+                GROUP BY m.id_materia, m.nombre
+                ORDER BY promedio DESC
+            `;
+        }
+
+        const resultado = await peticion.query(consulta);
+        return resultado.recordset;
     }
 }
 

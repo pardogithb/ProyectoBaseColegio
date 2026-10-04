@@ -1,8 +1,27 @@
 const API_URL = 'http://localhost:3000/api';
 
+function llenarFiltroGradoPromedio(estudiantes) {
+    const select = document.getElementById('filtroGradoPromedio');
+    const gradoSeleccionado = select.value;
+    const grados = [...new Set(estudiantes.map(est => est.grado).filter(Boolean))];
+
+    select.innerHTML = '<option value="">-- Todos los cursos --</option>';
+    grados.forEach(grado => {
+        const opcion = document.createElement('option');
+        opcion.value = grado;
+        opcion.textContent = grado;
+        select.appendChild(opcion);
+    });
+
+    if (grados.includes(gradoSeleccionado)) {
+        select.value = gradoSeleccionado;
+    }
+}
+
 async function cargarEstudiantes() {
     const respuesta = await fetch(`${API_URL}/estudiantes`);
     const estudiantes = await respuesta.json();
+    llenarFiltroGradoPromedio(estudiantes);
 
     const tbody = document.querySelector('#tablaEstudiantes tbody');
     tbody.innerHTML = '';
@@ -82,44 +101,6 @@ document.getElementById('formNota').addEventListener('submit', async (e) => {
     document.getElementById('formNota').reset();
     alert('Nota registrada');
     cargarNotas();
-});
-
-document.getElementById('btnConsultarPromedio').addEventListener('click', async () => {
-    const resultado = document.getElementById('resultadoPromedio');
-    const id = document.getElementById('idEstudianteConsulta').value.trim();
-    const idMateria = document.getElementById('idMateriaConsulta').value.trim();
-
-    if (!id) {
-        resultado.textContent = 'Escribe el ID del estudiante para consultar el promedio.';
-        return;
-    }
-
-    const rutaPromedio = idMateria
-        ? `/notas/promedio/${id}/materia/${idMateria}`
-        : `/notas/promedio/${id}`;
-
-    resultado.textContent = 'Consultando...';
-
-    try {
-        const respuesta = await fetch(`${API_URL}${rutaPromedio}`);
-
-        if (!respuesta.ok) {
-            resultado.textContent = `El servidor respondió con error ${respuesta.status}. Revisa la consola del backend.`;
-            return;
-        }
-
-        const datos = await respuesta.json();
-
-        if (datos.promedio === null || datos.promedio === undefined) {
-            resultado.textContent = idMateria
-                ? 'Ese estudiante no tiene notas registradas en esa materia.'
-                : 'Ese estudiante no tiene notas registradas.';
-        } else {
-            resultado.textContent = `Promedio: ${Number(datos.promedio).toFixed(1)}`;
-        }
-    } catch (error) {
-        resultado.textContent = 'No se pudo conectar con el servidor. Revisa que esté encendido en http://localhost:3000.';
-    }
 });
 
 async function cargarMaterias() {
@@ -211,98 +192,65 @@ async function cargarNotas() {
             <td>${nombreMateria[nota.id_materia] ?? nota.id_materia}</td>
             <td><span class="nota ${nota.valor < 3 ? 'nota-baja' : 'nota-alta'}">${Number(nota.valor).toFixed(1)}</span></td>
             <td>${nota.periodo}</td>
+            <td><button class="btn-eliminar" onclick="eliminarNota(${nota.id_nota})">Eliminar</button></td>
         `;
         tbody.appendChild(fila);
     });
 }
 
-function mostrarVista(idVista) {
-    document.querySelectorAll('.vista').forEach(vista => {
-        vista.hidden = true;
-    });
-    document.getElementById(idVista).hidden = false;
-    window.scrollTo(0, 0);
-
-    if (idVista === 'menuPrincipal') {
-        cargarResumen();
-    }
-
-    if (idVista === 'vistaNotas') {
+async function eliminarNota(id) {
+    if (confirm('¿Seguro que quieres eliminar esta nota?')) {
+        await fetch(`${API_URL}/notas/${id}`, { method: 'DELETE' });
         cargarNotas();
     }
-
-    if (idVista === 'vistaPromedio') {
-        cargarPromedioMaterias();
-    }
 }
 
-async function cargarResumen() {
-    try {
-        const [estudiantes, materias, notas] = await Promise.all([
-            fetch(`${API_URL}/estudiantes`).then(r => r.json()),
-            fetch(`${API_URL}/materias`).then(r => r.json()),
-            fetch(`${API_URL}/notas`).then(r => r.json())
-        ]);
+document.querySelectorAll('.tab-btn').forEach(boton => {
+    boton.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('activo'));
+        document.querySelectorAll('.tab-contenido').forEach(contenido => contenido.classList.remove('activo'));
 
-        document.getElementById('conteoEstudiantes').textContent =
-            estudiantes.length === 1 ? '1 estudiante registrado' : `${estudiantes.length} estudiantes registrados`;
-        document.getElementById('conteoMaterias').textContent =
-            materias.length === 1 ? '1 materia registrada' : `${materias.length} materias registradas`;
-        document.getElementById('conteoNotas').textContent =
-            notas.length === 1 ? '1 nota registrada' : `${notas.length} notas registradas`;
+        boton.classList.add('activo');
+        document.getElementById(boton.dataset.tab).classList.add('activo');
 
-        const materiasConNotas = new Set(notas.map(nota => Number(nota.id_materia))).size;
-        document.getElementById('conteoPromedio').textContent =
-            `${materiasConNotas} de ${materias.length} materias con notas`;
-    } catch (error) {
-        document.getElementById('conteoEstudiantes').textContent = 'Sin conexión con el servidor';
-        document.getElementById('conteoMaterias').textContent = 'Sin conexión con el servidor';
-        document.getElementById('conteoNotas').textContent = 'Sin conexión con el servidor';
-        document.getElementById('conteoPromedio').textContent = 'Sin conexión con el servidor';
-    }
-}
+        if (boton.dataset.tab === 'tabNotas') {
+            cargarNotas();
+        }
 
-document.querySelectorAll('[data-vista]').forEach(boton => {
-    boton.addEventListener('click', () => mostrarVista(boton.dataset.vista));
-});
-
-document.querySelectorAll('[data-volver]').forEach(boton => {
-    boton.addEventListener('click', () => mostrarVista('menuPrincipal'));
+        if (boton.dataset.tab === 'vistaPromedio') {
+            cargarPromedioMaterias();
+        }
+    });
 });
 
 async function cargarPromedioMaterias() {
-    const [notas, materias] = await Promise.all([
-        fetch(`${API_URL}/notas`).then(r => r.json()),
-        fetch(`${API_URL}/materias`).then(r => r.json())
-    ]);
+    const grado = document.getElementById('filtroGradoPromedio').value;
+    const ruta = grado
+        ? `${API_URL}/notas/promedio-materias?grado=${encodeURIComponent(grado)}`
+        : `${API_URL}/notas/promedio-materias`;
+    const respuesta = await fetch(ruta);
+    const datos = await respuesta.json();
 
     const tbody = document.querySelector('#tablaPromedioMaterias tbody');
     tbody.innerHTML = '';
 
-    materias.forEach(materia => {
-        const notasMateria = notas.filter(nota => Number(nota.id_materia) === Number(materia.id_materia));
+    datos.forEach(materia => {
         const fila = document.createElement('tr');
-
-        if (notasMateria.length === 0) {
-            fila.innerHTML = `
-                <td>${materia.id_materia}</td>
-                <td>${materia.nombre}</td>
-                <td>Sin notas</td>
-                <td>0</td>
-            `;
-        } else {
-            const suma = notasMateria.reduce((total, nota) => total + Number(nota.valor), 0);
-            const promedio = suma / notasMateria.length;
-            fila.innerHTML = `
-                <td>${materia.id_materia}</td>
-                <td>${materia.nombre}</td>
-                <td><span class="nota ${promedio < 3 ? 'nota-baja' : 'nota-alta'}">${promedio.toFixed(1)}</span></td>
-                <td>${notasMateria.length}</td>
-            `;
-        }
+        const promedio = materia.promedio === null ? null : Number(materia.promedio);
+        const promedioHtml = promedio === null
+            ? 'Sin notas'
+            : `<span class="nota ${promedio < 3 ? 'nota-baja' : 'nota-alta'}">${promedio.toFixed(1)}</span>`;
+        fila.innerHTML = `
+            <td>${materia.id_materia}</td>
+            <td>${materia.nombre}</td>
+            <td>${promedioHtml}</td>
+            <td>${materia.cantidad}</td>
+        `;
 
         tbody.appendChild(fila);
     });
 }
 
-cargarResumen();
+document.getElementById('btnVerPromedioMaterias').addEventListener('click', cargarPromedioMaterias);
+
+cargarNotas();
