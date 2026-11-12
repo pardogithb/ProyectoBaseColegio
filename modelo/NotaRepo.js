@@ -1,5 +1,5 @@
 import RepositorioBase from './RepositorioBase.js';
-import { sql, pool } from '../db.js';
+import { sql, pool } from './db.js';
 
 class NotaRepo extends RepositorioBase {
     constructor() {

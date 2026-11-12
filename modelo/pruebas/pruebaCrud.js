@@ -1,4 +1,4 @@
-import EstudianteRepo from '../modelos/EstudianteRepo.js';
+import EstudianteRepo from '../EstudianteRepo.js';
 
 async function probar() {
     const estudianteRepo = new EstudianteRepo();

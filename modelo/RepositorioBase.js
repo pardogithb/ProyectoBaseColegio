@@ -1,4 +1,4 @@
-import { sql, pool } from '../db.js';
+import { sql, pool } from './db.js';
 
 class RepositorioBase {
     constructor(nombreTabla) {

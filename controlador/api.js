@@ -1,9 +1,9 @@
 import express from 'express';
 const router = express.Router();
 
-import EstudianteRepo from '../modelos/EstudianteRepo.js';
-import MateriaRepo from '../modelos/MateriaRepo.js';
-import NotaRepo from '../modelos/NotaRepo.js';
+import EstudianteRepo from '../modelo/EstudianteRepo.js';
+import MateriaRepo from '../modelo/MateriaRepo.js';
+import NotaRepo from '../modelo/NotaRepo.js';
 
 const estudianteRepo = new EstudianteRepo();
 const materiaRepo = new MateriaRepo();
